@@ -172,6 +172,7 @@ export const supabaseService = {
       throw new Error('Attendance already marked for today.');
     }
 
+    // Try inserting with location_address first
     const { data, error } = await supabase
       .from('attendance')
       .insert([
@@ -188,7 +189,31 @@ export const supabaseService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      // If location_address column does not exist in Supabase schema cache yet, fallback to standard schema
+      if (error.message && (error.message.includes('location_address') || error.code === 'PGRST204')) {
+        console.warn('location_address column not found in Supabase, falling back to basic schema:', error.message);
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('attendance')
+          .insert([
+            {
+              staff_id: staffId,
+              selfie_url: selfieUrl,
+              date: date,
+              time: time,
+              latitude: latitude,
+              longitude: longitude,
+            },
+          ])
+          .select()
+          .single();
+
+        if (fallbackError) throw fallbackError;
+        return fallbackData;
+      }
+      throw error;
+    }
+
     return data;
   },
 
