@@ -87,40 +87,6 @@ For testing and evaluation:
 
 ---
 
-## 🗄️ Database & Storage Setup (Supabase)
-
-Run the included `supabase_schema.sql` script in your Supabase SQL Editor:
-
-```sql
--- Staff Table
-CREATE TABLE IF NOT EXISTS public.staff (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    employee_id TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL DEFAULT 'Staff@123',
-    admin_email TEXT NOT NULL DEFAULT 'admin@attendx.com',
-    face_embedding JSONB,
-    face_image_url TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- Attendance Table
-CREATE TABLE IF NOT EXISTS public.attendance (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    staff_id UUID NOT NULL REFERENCES public.staff(id) ON DELETE CASCADE,
-    selfie_url TEXT,
-    date DATE NOT NULL,
-    time TIME NOT NULL,
-    latitude DOUBLE PRECISION NOT NULL,
-    longitude DOUBLE PRECISION NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    CONSTRAINT unique_staff_attendance_per_day UNIQUE (staff_id, date)
-);
-```
-
-Storage Bucket: Create a public storage bucket named `attendance-selfies`.
-
 ---
 
 ## 📱 Build & Run Instructions
@@ -140,5 +106,4 @@ npx react-native run-android
 cd android
 ./gradlew assembleRelease
 ```
-Output APK location:
-`android/app/build/outputs/apk/release/app-release.apk`
+
