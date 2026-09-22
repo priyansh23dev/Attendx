@@ -92,20 +92,30 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
+    aaptOptions {
+        noCompress "tflite"
+    }
 }
+
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
@@ -116,4 +126,14 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // Google ML Kit Face Detection
+    implementation 'com.google.mlkit:face-detection:16.1.7'
+
+    // TensorFlow Lite
+    implementation 'org.tensorflow:tensorflow-lite:2.16.1'
 }
+
+
+
+
